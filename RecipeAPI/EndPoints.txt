@@ -1,0 +1,37 @@
+﻿
+Resources: ShopList, Recipe ShopListRecipe
+
+URI | Description | RequestBody | ResponseBody
+
+ShopList
+
+GET /api/shoplists | Get all Shoplists | None | List of ShopListModels 
+GET /api/shoplists/{id} | Get shoplist by id | None | ShopListModel
+GET /api/shoplists/{id}/recipes | Get all recipes for a specific shoplist | None | List of RecipeModels
+GET /api/shoplists/search?dateTime={dateTime} | Get all shoplists with specific CreatedDate | None | List of ShoplistModels
+
+POST /api/shoplists | Add new ShopList | ShopListModel | ShopListModel
+PUT /api/shoplists/{id} | Update existing ShopList | ShopListModel | ShopListModel
+DELETE /api/shoplists/{id} | Delete ShopList | None | None
+
+Recipe
+
+GET /api/recipes | Get all Recipes | None | List of RecipeModels 
+GET/api/recipes?category={category} | Get all Recipes with specific Category | None | List of RecipeModels
+GET /api/recipes/{id} | Get Recipe by id | None | RecipeModel
+GET /api/recipes/{id}/shoplists | Get all ShopLists for a specific Recipe | None | List of ShopListModels
+
+POST /api/recipes | Add new Recipe | RecipeModel | RecipeModel
+PUT /api/recipes/{id} | Update existing Recipe | RecipeModel | RecipeModel
+DELETE /api/recipes/{id} | Delete Recipe | None | None
+
+ShopListRecipe
+
+GET /api/shoplistrecipes | Get all ShopListRecipes | None | List of ShopListRecipeModels 
+GET /api/shoplistrecipes?shoplistid={shopListId} | Get all ShopListRecipes with specific shopListId | None | List of ShopListRecipeModel
+GET /api/shoplistrecipes?recipeid={recipeId} | Get all ShopListRecipes with specific recipeId | None | List of ShopListRecipeModel
+GET /api/shoplistrecipes/{id} | Get ShopListRecipe by id | None | ShopListRecipeModel
+
+POST /api/shoplistrecipes | Add new ShopListRecipe | ShopListRecipeModel | ShopListRecipeModel
+PUT /api/shoplistrecipes/{id} | Update existing ShopListRecipe | ShopListRecipeModel | ShopListRecipeModel
+DELETE /api/shoplistrecipes/{id} | Delete ShopListRecipe | None | None
