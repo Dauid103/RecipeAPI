@@ -18,11 +18,14 @@ namespace RecipeAPI.Controllers
     {
         private readonly IRepository _repository;
         private readonly IMapper _mapper;
+        private readonly IShopListRecipeService _shopListRecipeService;
+        private string errorMessage;
 
-        public ShopListRecipesController(IRepository repository, IMapper mapper)
+        public ShopListRecipesController(IRepository repository, IMapper mapper, IShopListRecipeService shopListRecipeService)
         {
             _repository = repository;
             _mapper = mapper;
+            _shopListRecipeService = shopListRecipeService;
         }
 
         // GET: api/<controller>
@@ -50,23 +53,23 @@ namespace RecipeAPI.Controllers
         [HttpPost]
         public ActionResult<ShopListRecipeModel> Post(ShopListRecipeModel model)
         {
+
+            
             if (model == null) return BadRequest();
-
-            var result = _repository.GetAllShopListRecipes().Where(slr => slr.ShopListId == model.ShopListId && slr.RecipeId == model.RecipeId);
-
-            if (result.Any()) return BadRequest($"There is already an exisiting ShopListRecipe with ShopListId {model.ShopListId} and RecipeId {model.RecipeId}");
-
 
             var shopListRecipe = _mapper.Map<ShopListRecipe>(model);
 
-            _repository.Add(shopListRecipe);
+            if(!_shopListRecipeService.VerifyAddShopListRecipe(shopListRecipe, model.ShopListId, model.RecipeId, out errorMessage))
+            {
+                return BadRequest(errorMessage);
+            }
 
             if (_repository.SaveChanges())
             {
                 return Created($"api/shoplistrecipes/{model.ShopListRecipeId}", _mapper.Map<ShopListRecipeModel>(shopListRecipe));
             }
 
-            return BadRequest();
+            return BadRequest("Could not add ShopListRecipe in database");
 
         }
 
@@ -76,20 +79,14 @@ namespace RecipeAPI.Controllers
         {
             if (model == null) return BadRequest();
 
-            
-            var shopList = _repository.GetShopListById(model.ShopListId);
-            if (shopList == null) return BadRequest($"No exisiting ShopList with id {model.ShopListId}");
-
-            var recipe = _repository.GetRecipeById(model.RecipeId);
-            if (shopList == null) return BadRequest($"No exisiting Recipe with id {model.RecipeId}");
-
-            var existingShopListRecipe = _repository.GetAllShopListRecipes().Where(slr => slr.ShopListId == model.ShopListId && slr.RecipeId == model.RecipeId);
-
-            if (existingShopListRecipe.Any()) return BadRequest($"There is already an exisiting ShopListRecipe with ShopListId {model.ShopListId} and RecipeId {model.RecipeId}");
-
             var result = _repository.GetShopListRecipeById(id);
 
             if (result == null) return NotFound();
+
+            if(!_shopListRecipeService.VerifyUpdateShopListRecipe(id, model.ShopListId, model.RecipeId, out errorMessage))
+            {
+                return BadRequest(errorMessage);
+            }
 
             _mapper.Map(model, result);
 

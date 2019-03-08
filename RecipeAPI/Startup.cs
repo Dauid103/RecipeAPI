@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ApplicationCore.Interfaces;
+using ApplicationCore.Services;
 using AutoMapper;
 using Infrastructure;
 using Infrastructure.Identity;
@@ -45,6 +46,7 @@ namespace RecipeAPI
                 options.UseSqlServer(Configuration.GetConnectionString("IdentityConnection")));
 
             services.AddScoped<IRepository, Repository>();
+            services.AddScoped<IShopListRecipeService, ShopListRecipeService>();
 
             services.AddTransient<RecipeIdentitySeeder>();
 

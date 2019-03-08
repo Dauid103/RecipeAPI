@@ -77,8 +77,7 @@ namespace Infrastructure.Repositories
 
         public Recipe GetRecipeById(int id)
         {
-            var result = _context.Recipes
-                .Where(r => r.RecipeId == id);
+            var result = _context.Recipes.Where(r => r.RecipeId == id);
 
             return result.FirstOrDefault();
         }
