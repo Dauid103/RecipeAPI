@@ -13,7 +13,6 @@ namespace RecipeAPI.Models
         public DateTime AddedToListDate { get; set; }
 
         public int ShopListId { get; set; }
-        
 
         public int RecipeId { get; set; }
         

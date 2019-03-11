@@ -18,6 +18,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using RecipeAPI.Extensions;
 
 namespace RecipeAPI
 {
@@ -34,25 +35,15 @@ namespace RecipeAPI
         public void ConfigureServices(IServiceCollection services)
         {
 
-            services.AddIdentity<ApplicationUser, IdentityRole>()
-             .AddEntityFrameworkStores<RecipeIdentityContext>();
+            services.ConfigureIdentity(Configuration);
 
-            // Add Recipe DbContext
-            services.AddDbContext<RecipeContext>(c =>
-                c.UseSqlServer(Configuration.GetConnectionString("RecipeConnection")));
+            services.ConfigureDbContext(Configuration);
 
-            // Add Identity DbContext
-            services.AddDbContext<RecipeIdentityContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("IdentityConnection")));
-
-            services.AddScoped<IRepository, Repository>();
-            services.AddScoped<IShopListRecipeService, ShopListRecipeService>();
-
-            services.AddTransient<RecipeIdentitySeeder>();
-
+            services.ConfigureCustomServices();
+            
             services.AddAutoMapper();
 
-            services.AddMvc().AddJsonOptions(opt => opt.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore).SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

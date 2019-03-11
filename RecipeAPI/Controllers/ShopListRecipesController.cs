@@ -59,7 +59,7 @@ namespace RecipeAPI.Controllers
 
             var shopListRecipe = _mapper.Map<ShopListRecipe>(model);
 
-            if(!_shopListRecipeService.VerifyAddShopListRecipe(shopListRecipe, model.ShopListId, model.RecipeId, out errorMessage))
+            if(!_shopListRecipeService.ValidateAddShopListRecipe(shopListRecipe, model.ShopListId, model.RecipeId, out errorMessage))
             {
                 return BadRequest(errorMessage);
             }
@@ -83,7 +83,7 @@ namespace RecipeAPI.Controllers
 
             if (result == null) return NotFound();
 
-            if(!_shopListRecipeService.VerifyUpdateShopListRecipe(id, model.ShopListId, model.RecipeId, out errorMessage))
+            if(!_shopListRecipeService.ValidateUpdateShopListRecipe(id, model.ShopListId, model.RecipeId, out errorMessage))
             {
                 return BadRequest(errorMessage);
             }

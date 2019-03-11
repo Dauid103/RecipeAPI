@@ -16,7 +16,7 @@ namespace ApplicationCore.Services
             _repository = repository;
         }
 
-        public bool VerifyAddShopListRecipe(ShopListRecipe shopListRecipe, int shopListId, int recipeId, out string errorMessage)
+        public bool ValidateAddShopListRecipe(ShopListRecipe shopListRecipe, int shopListId, int recipeId, out string errorMessage)
         {
 
             var result = _repository.GetAllShopListRecipes().Where(slr => slr.ShopListId == shopListId && slr.RecipeId == recipeId);
@@ -33,7 +33,7 @@ namespace ApplicationCore.Services
             return true;
         }
 
-        public bool VerifyUpdateShopListRecipe(int id, int shopListId, int recipeId, out string errorMessage)
+        public bool ValidateUpdateShopListRecipe(int id, int shopListId, int recipeId, out string errorMessage)
         {
             var shopList = _repository.GetShopListById(shopListId);
             if (shopList == null)

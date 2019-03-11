@@ -7,8 +7,8 @@ namespace ApplicationCore.Interfaces
 {
     public interface IShopListRecipeService
     {
-        bool VerifyAddShopListRecipe(ShopListRecipe shopListRecipe, int shopListId, int recipeId, out string errorMessage);
-        bool VerifyUpdateShopListRecipe(int id, int shopListId, int recipeId, out string errorMessage);
+        bool ValidateAddShopListRecipe(ShopListRecipe shopListRecipe, int shopListId, int recipeId, out string errorMessage);
+        bool ValidateUpdateShopListRecipe(int id, int shopListId, int recipeId, out string errorMessage);
         
     }
 }

@@ -1,6 +1,7 @@
 ﻿using ApplicationCore.Entities;
 using ApplicationCore.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,11 +11,14 @@ namespace Infrastructure.Repositories
 {
     public class Repository : IRepository
     {
+        
         private readonly RecipeContext _context;
+        private readonly ILogger<Repository> _logger;
 
-        public Repository(RecipeContext context)
+        public Repository(RecipeContext context, ILogger<Repository> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         public IEnumerable<T> GetAll<T>() where T : class
@@ -29,17 +33,20 @@ namespace Infrastructure.Repositories
 
         public void Add<T>(T entity) where T : class
         {
+            _logger.LogInformation($"Adding an object of type {entity.GetType()} to the context.");
             _context.Add(entity);
         }
 
         public void Delete<T>(T entity) where T : class
         {
+            _logger.LogInformation($"Removing an object of type {entity.GetType()} to the context.");
             _context.Remove(entity);
         }
 
         public bool SaveChanges()
         {
-           return _context.SaveChanges() > 0;
+            _logger.LogInformation($"Attempitng to save the changes in the context");
+            return _context.SaveChanges() > 0;
         }
 
 
