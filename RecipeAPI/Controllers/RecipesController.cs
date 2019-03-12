@@ -164,7 +164,7 @@ namespace RecipeAPI.Controllers
                     return Ok();
                 }
 
-                return BadRequest("Failed delete ShopListRecipe in database");
+                return BadRequest("Failed to delete ShopListRecipe in database");
             }
             catch (Exception ex)
             {

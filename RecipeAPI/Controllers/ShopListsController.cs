@@ -130,7 +130,7 @@ namespace RecipeAPI.Controllers
                     return Created($"api/´shoplists/{model.ShopListId}", _mapper.Map<ShopListModel>(result));
                 }
 
-                return BadRequest();
+                return BadRequest("Failed to add ShopList in database");
             }
             catch(Exception ex)
             {
@@ -160,7 +160,7 @@ namespace RecipeAPI.Controllers
                     return _mapper.Map<ShopListModel>(result);
                 }
 
-                return BadRequest();
+                return BadRequest("Failed to update ShopList in database");
             }
             catch (Exception ex)
             {
@@ -171,7 +171,7 @@ namespace RecipeAPI.Controllers
         }
 
         [HttpDelete("{id:int}")]
-        public IActionResult DeleteRecipe(int id)
+        public IActionResult DeleteShopList(int id)
         {
             try
             {
@@ -186,11 +186,11 @@ namespace RecipeAPI.Controllers
                     return Ok();
                 }
 
-                return BadRequest();
+                return BadRequest("Failed to delete ShopList in database");
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Something went wrong inside DeleteRecipe Action: {ex}");
+                _logger.LogError($"Something went wrong inside DeleteShopList Action: {ex}");
                 return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server error");
             }
 

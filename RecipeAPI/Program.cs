@@ -21,13 +21,6 @@ namespace RecipeAPI
         {
             var host = BuildWebHost(args);
 
-            //var scopeFactory = host.Services.GetService<IServiceScopeFactory>();
-            //using (var scope = scopeFactory.CreateScope())
-            //{
-            //    var seeder = scope.ServiceProvider.GetService<RecipeIdentitySeeder>();
-            //    seeder.SeedAsync().Wait();
-            //}
-
             using (var scope = host.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
@@ -46,7 +39,6 @@ namespace RecipeAPI
                     logger.LogError(ex, "An error occurred seeding the DB.");
                 }
             }
-
 
             host.Run();
         }
