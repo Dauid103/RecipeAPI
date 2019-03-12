@@ -8,18 +8,10 @@ namespace Infrastructure.Identity
 {
     public class RecipeIdentitySeeder
     {
-        private readonly RecipeIdentityContext _context;
-        private readonly UserManager<ApplicationUser> _userManager;
-
-        public RecipeIdentitySeeder(RecipeIdentityContext context, UserManager<ApplicationUser> userManager)
+        
+        public static async Task SeedAsync(UserManager<ApplicationUser> userManager)
         {
-            _context = context;
-            _userManager = userManager;
-        }
-
-        public async Task SeedAsync()
-        {
-            ApplicationUser user = await _userManager.FindByEmailAsync("daviande@kth.se");
+            ApplicationUser user = await userManager.FindByEmailAsync("daviande@kth.se");
             if (user == null)
             {
                 user = new ApplicationUser()
@@ -30,14 +22,13 @@ namespace Infrastructure.Identity
                     Email = "daviande@kth.se"
                 };
 
-                var result = await _userManager.CreateAsync(user, "Welc0me!");
+                var result = await userManager.CreateAsync(user, "Welc0me!");
                 if (result != IdentityResult.Success)
                 {
                     throw new InvalidOperationException("Could not create user in Seeding");
                 }
             }
 
-            _context.SaveChanges();
         }
     }
 }

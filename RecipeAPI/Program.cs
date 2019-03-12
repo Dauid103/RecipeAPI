@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Infrastructure;
+using Infrastructure.Data;
 using Infrastructure.Identity;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
@@ -19,12 +21,32 @@ namespace RecipeAPI
         {
             var host = BuildWebHost(args);
 
-            var scopeFactory = host.Services.GetService<IServiceScopeFactory>();
-            using (var scope = scopeFactory.CreateScope())
+            //var scopeFactory = host.Services.GetService<IServiceScopeFactory>();
+            //using (var scope = scopeFactory.CreateScope())
+            //{
+            //    var seeder = scope.ServiceProvider.GetService<RecipeIdentitySeeder>();
+            //    seeder.SeedAsync().Wait();
+            //}
+
+            using (var scope = host.Services.CreateScope())
             {
-                var seeder = scope.ServiceProvider.GetService<RecipeIdentitySeeder>();
-                seeder.SeedAsync().Wait();
+                var services = scope.ServiceProvider;
+                var loggerFactory = services.GetRequiredService<ILoggerFactory>();
+                try
+                {
+                    var catalogContext = services.GetRequiredService<RecipeContext>();
+                    RecipeDbSeeder.SeedAsync(catalogContext, loggerFactory).Wait();
+
+                    var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+                    RecipeIdentitySeeder.SeedAsync(userManager).Wait();
+                }
+                catch (Exception ex)
+                {
+                    var logger = loggerFactory.CreateLogger<Program>();
+                    logger.LogError(ex, "An error occurred seeding the DB.");
+                }
             }
+
 
             host.Run();
         }

@@ -37,7 +37,6 @@ namespace RecipeAPI.Extensions
             services.AddScoped<IRepository, Repository>();
             services.AddScoped<IShopListRecipeService, ShopListRecipeService>();
 
-            services.AddTransient<RecipeIdentitySeeder>();
         }
 
     }
