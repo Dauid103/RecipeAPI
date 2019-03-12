@@ -19,10 +19,10 @@ namespace RecipeAPI.Controllers
     public class RecipesController : ControllerBase
     {
         private readonly IRepository _repository;
-        private readonly ILogger _logger;
+        private readonly ILogger<RecipesController> _logger;
         private readonly IMapper _mapper;
 
-        public RecipesController(IRepository repository, ILogger logger, IMapper mapper)
+        public RecipesController(IRepository repository, ILogger<RecipesController> logger, IMapper mapper)
         {
             _repository = repository;
             _logger = logger;
