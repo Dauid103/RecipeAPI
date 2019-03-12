@@ -5,7 +5,9 @@ using System.Threading.Tasks;
 using ApplicationCore.Entities;
 using ApplicationCore.Interfaces;
 using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using RecipeAPI.Models;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -17,103 +19,158 @@ namespace RecipeAPI.Controllers
     public class RecipesController : ControllerBase
     {
         private readonly IRepository _repository;
+        private readonly ILogger _logger;
         private readonly IMapper _mapper;
 
-        public RecipesController(IRepository repository, IMapper mapper)
+        public RecipesController(IRepository repository, ILogger logger, IMapper mapper)
         {
             _repository = repository;
+            _logger = logger;
             _mapper = mapper;
         }
         
         [HttpGet]
-        public ActionResult<List<RecipeModel>> Get(string category = null)
+        public ActionResult<List<RecipeModel>> GetRecipes(string category = null)
         {
-            
-            var result = _repository.GetAllRecipes(category);
+            try
+            {
+                var result = _repository.GetAllRecipes(category);
 
-            return _mapper.Map<List<RecipeModel>>(result);
+                return _mapper.Map<List<RecipeModel>>(result);
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError($"Something went wrong inside GetRecipes Action: {ex}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server error");
+            }
+            
         }
         
         [HttpGet("{id}")]
-        public ActionResult<RecipeModel> Get(int id)
+        public ActionResult<RecipeModel> GetRecipe(int id)
         {
-            var result = _repository.GetRecipeById(id);
+            try
+            {
+                var result = _repository.GetRecipeById(id);
 
-            if (result == null) return NotFound();
+                if (result == null) return NotFound($"Unable to find Recipe with id: {id}");
 
-            return _mapper.Map<RecipeModel>(result);
+                return _mapper.Map<RecipeModel>(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Something went wrong inside GetRecipe Action: {ex}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server error");
+            }
+            
         }
         
 
         [HttpGet("{id}/shoplists")]
         public ActionResult<List<ShopListModel>> GetRecipeShopLists(int id)
         {
-            List<ShopList> shopLists = new List<ShopList>();
 
-            var result = _repository.GetAllShopListRecipes(0,id);
-
-            foreach (var shopListItem in result)
+            try
             {
-                shopLists.Add(_repository.GetShopListById(shopListItem.ShopListId));
-            }
+                List<ShopList> shopLists = new List<ShopList>();
 
-            return _mapper.Map<List<ShopListModel>>(shopLists);
+                var result = _repository.GetAllShopListRecipes(0, id);
+
+                foreach (var shopListItem in result)
+                {
+                    shopLists.Add(_repository.GetShopListById(shopListItem.ShopListId));
+                }
+
+                return _mapper.Map<List<ShopListModel>>(shopLists);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Something went wrong inside GetRecipeShopLists Action: {ex}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server error");
+            }
+            
         }
 
         [HttpPost]
-        public ActionResult<RecipeModel> Post(RecipeModel model)
+        public ActionResult<RecipeModel> AddRecipe(RecipeModel model)
         {
-            if (model == null) return BadRequest();
 
-            var result = _mapper.Map<Recipe>(model);
-
-           
-            _repository.Add(result);
-
-            if (_repository.SaveChanges())
+            try
             {
-                return Created($"api/recipes/{model.RecipeId}", _mapper.Map<RecipeModel>(result));
-            }
+                if (model == null) return BadRequest("RecipeModel is incorrect");
 
-            return BadRequest();
+                var result = _mapper.Map<Recipe>(model);
+
+
+                _repository.Add(result);
+
+                if (_repository.SaveChanges())
+                {
+                    return Created($"api/recipes/{model.RecipeId}", _mapper.Map<RecipeModel>(result));
+                }
+
+                return BadRequest("Failed to add Recipe in database");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Something went wrong inside AddRecipe Action: {ex}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server error");
+            }
 
         }
 
         // PUT api/<controller>/5
         [HttpPut("{id}")]
-        public ActionResult<RecipeModel> Edit(int id, RecipeModel model)
+        public ActionResult<RecipeModel> UpdateRecipe(int id, RecipeModel model)
         {
-            if (model == null) return BadRequest();
-
-            var result = _repository.GetRecipeById(id);
-            if (result == null) return NotFound();
-
-            _mapper.Map(model, result);
-
-            if (_repository.SaveChanges())
+            try
             {
-                return _mapper.Map<RecipeModel>(result);
-            }
+                if (model == null) return BadRequest("RecipeModel is incorrect");
 
-            return BadRequest();
+                var result = _repository.GetRecipeById(id);
+                if (result == null) return NotFound($"Unable to find Recipe with id: {id}");
+
+                _mapper.Map(model, result);
+
+                if (_repository.SaveChanges())
+                {
+                    return _mapper.Map<RecipeModel>(result);
+                }
+
+                return BadRequest("Failed to update Recipe in database");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Something went wrong inside UpdateRecipe Action: {ex}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server error");
+            }
+            
 
         }
 
         // DELETE api/<controller>/5
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public IActionResult DeleteRecipe(int id)
         {
-            var result = _repository.GetRecipeById(id);
-            if (result == null) return NotFound();
-
-            _repository.Delete(result);
-
-            if (_repository.SaveChanges())
+            try
             {
-                return Ok();
-            }
+                var result = _repository.GetRecipeById(id);
+                if (result == null) return NotFound($"Unable to find Recipe with id: {id}");
 
-            return BadRequest();
+                _repository.Delete(result);
+
+                if (_repository.SaveChanges())
+                {
+                    return Ok();
+                }
+
+                return BadRequest("Failed delete ShopListRecipe in database");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Something went wrong inside DeleteRecipe Action: {ex}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server error");
+            }
 
         }
     }

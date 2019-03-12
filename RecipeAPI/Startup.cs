@@ -48,6 +48,7 @@ namespace RecipeAPI
             {
                 app.UseDeveloperExceptionPage();
             }
+            
 
             app.UseAuthentication();
 

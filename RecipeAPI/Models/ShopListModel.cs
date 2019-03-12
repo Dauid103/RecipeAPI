@@ -15,7 +15,8 @@ namespace RecipeAPI.Models
         [StringLength(50)]
         public string Name { get; set; }
 
-        public DateTime CreatedDate { get; set; }
+        [Required]
+        public DateTime CreatedDate { get; set; } 
 
     }
 }

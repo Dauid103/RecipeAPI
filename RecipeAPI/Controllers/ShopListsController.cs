@@ -5,7 +5,9 @@ using System.Threading.Tasks;
 using ApplicationCore.Entities;
 using ApplicationCore.Interfaces;
 using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using RecipeAPI.Models;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -17,114 +19,180 @@ namespace RecipeAPI.Controllers
     public class ShopListsController : ControllerBase
     {
         private readonly IRepository _repository;
+        private readonly ILogger _logger;
         private readonly IMapper _mapper;
 
-        public ShopListsController(IRepository repository, IMapper mapper)
+        public ShopListsController(IRepository repository, ILogger logger, IMapper mapper)
         {
             _repository = repository;
+            _logger = logger;
             _mapper = mapper;
         }
 
         [HttpGet]
-        public ActionResult<List<ShopListModel>> Get()
+        public ActionResult<List<ShopListModel>> GetShopLists()
         {
-            var result = _repository.GetAllShopLists();
+            try
+            {
+                var result = _repository.GetAllShopLists();
 
-            return _mapper.Map<List<ShopListModel>>(result);
+                return _mapper.Map<List<ShopListModel>>(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Something went wrong inside GetShopLists Action: {ex}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server error");
+            }
+            
             
         }
 
         [HttpGet("{id:int}")]
-        public ActionResult<ShopListModel> Get(int id)
+        public ActionResult<ShopListModel> GetShopList(int id)
         {
-            var result =_repository.GetShopListById(id);
+            try
+            {
+                var result = _repository.GetShopListById(id);
 
-            if (result == null) return NotFound();
+                if (result == null) return NotFound();
 
-            return _mapper.Map<ShopListModel>(result);
+                return _mapper.Map<ShopListModel>(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Something went wrong inside GetShopList Action: {ex}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server error");
+            }
         }
 
         [HttpGet("{id:int}/recipes")]
         public ActionResult<List<RecipeModel>> GetShopListRecipes(int id)
         {
-            List<Recipe> recipes = new List<Recipe>();
 
-            var result = _repository.GetAllShopListRecipes(id);
-
-            foreach(var shopListItem in result)
+            try
             {
-                recipes.Add(_repository.GetRecipeById(shopListItem.RecipeId));
-            }
+                List<Recipe> recipes = new List<Recipe>();
 
-            return _mapper.Map<List<RecipeModel>>(recipes);
+                var result = _repository.GetAllShopListRecipes(id);
+
+                foreach (var shopListItem in result)
+                {
+                    recipes.Add(_repository.GetRecipeById(shopListItem.RecipeId));
+                }
+
+                return _mapper.Map<List<RecipeModel>>(recipes);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Something went wrong inside GetShopListRecipes Action: {ex}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server error");
+            }
 
         }
 
         [HttpGet("{search}")]
-        public ActionResult<List<ShopListModel>> SearchByDate(DateTime dateTime)
+        public ActionResult<List<ShopListModel>> SearcShopListhByDate(DateTime dateTime)
         {
-            var result = _repository.GetShopListsByCreatedDate(dateTime);
 
-            if (result == null) return NotFound();
+            try
+            {
+                var result = _repository.GetShopListsByCreatedDate(dateTime);
 
-            return _mapper.Map<List<ShopListModel>>(result);
+                if (result == null) return NotFound();
+
+                return _mapper.Map<List<ShopListModel>>(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Something went wrong inside SearchShopListByDate Action: {ex}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server error");
+            }
+            
         }
         
         [HttpPost]
-        public ActionResult<ShopListModel> Post(ShopListModel model)
+        public ActionResult<ShopListModel> AddShopList(ShopListModel model)
         {
-            if(model == null)
+
+            try
             {
+                if (model == null)
+                {
+                    return BadRequest();
+                }
+
+                var result = _mapper.Map<ShopList>(model);
+
+                _repository.Add(result);
+
+                if (_repository.SaveChanges())
+                {
+                    return Created($"api/´shoplists/{model.ShopListId}", _mapper.Map<ShopListModel>(result));
+                }
+
                 return BadRequest();
             }
-
-            var result = _mapper.Map<ShopList>(model);
-
-            _repository.Add(result);
-
-            if (_repository.SaveChanges())
+            catch(Exception ex)
             {
-                return Created($"api/´shoplists/{model.ShopListId}", _mapper.Map<ShopListModel>(result));
+                _logger.LogError($"Something went wrong inside AddShopList Action: {ex}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server error");
             }
-
-            return BadRequest();
+           
 
         }
 
         [HttpPut("{id:int}")]
-        public ActionResult<ShopListModel> Edit(int id, ShopListModel model)
+        public ActionResult<ShopListModel> UpdateShopList(int id, ShopListModel model)
         {
-            if(model == null) return BadRequest();
 
-            var result = _repository.GetShopListById(id);
-
-            if (result == null) return NotFound();
-
-            _mapper.Map(model, result);
-
-            if (_repository.SaveChanges())
+            try
             {
-                return _mapper.Map<ShopListModel>(result);
+                if (model == null) return BadRequest();
+
+                var result = _repository.GetShopListById(id);
+
+                if (result == null) return NotFound();
+
+                _mapper.Map(model, result);
+
+                if (_repository.SaveChanges())
+                {
+                    return _mapper.Map<ShopListModel>(result);
+                }
+
+                return BadRequest();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Something went wrong inside UpdateShopList Action: {ex}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server error");
             }
 
-            return BadRequest();
         }
 
         [HttpDelete("{id:int}")]
-        public IActionResult Delete(int id)
+        public IActionResult DeleteRecipe(int id)
         {
-            var result = _repository.GetShopListById(id);
-
-            if (result == null) return NotFound();
-
-            _repository.Delete(result);
-
-            if (_repository.SaveChanges())
+            try
             {
-                return Ok();
-            }
+                var result = _repository.GetShopListById(id);
 
-            return BadRequest();
+                if (result == null) return NotFound();
+
+                _repository.Delete(result);
+
+                if (_repository.SaveChanges())
+                {
+                    return Ok();
+                }
+
+                return BadRequest();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Something went wrong inside DeleteRecipe Action: {ex}");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server error");
+            }
 
         }
         
