@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using ApplicationCore.Entities;
 using ApplicationCore.Interfaces;
 using AutoMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -111,6 +113,7 @@ namespace RecipeAPI.Controllers
         }
         
         [HttpPost]
+        [Authorize]
         public ActionResult<ShopListModel> AddShopList(ShopListModel model)
         {
 
@@ -142,6 +145,7 @@ namespace RecipeAPI.Controllers
         }
 
         [HttpPut("{id:int}")]
+        [Authorize]
         public ActionResult<ShopListModel> UpdateShopList(int id, ShopListModel model)
         {
 
@@ -171,6 +175,7 @@ namespace RecipeAPI.Controllers
         }
 
         [HttpDelete("{id:int}")]
+        [Authorize]
         public IActionResult DeleteShopList(int id)
         {
             try
