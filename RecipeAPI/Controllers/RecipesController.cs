@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using ApplicationCore.Entities;
 using ApplicationCore.Interfaces;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -92,6 +93,7 @@ namespace RecipeAPI.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public ActionResult<RecipeModel> AddRecipe(RecipeModel model)
         {
 
@@ -121,6 +123,7 @@ namespace RecipeAPI.Controllers
 
         // PUT api/<controller>/5
         [HttpPut("{id}")]
+        [Authorize]
         public ActionResult<RecipeModel> UpdateRecipe(int id, RecipeModel model)
         {
             try
@@ -150,6 +153,7 @@ namespace RecipeAPI.Controllers
 
         // DELETE api/<controller>/5
         [HttpDelete("{id}")]
+        [Authorize]
         public IActionResult DeleteRecipe(int id)
         {
             try

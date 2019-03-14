@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using ApplicationCore.Entities;
 using ApplicationCore.Interfaces;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -72,6 +73,7 @@ namespace RecipeAPI.Controllers
 
         // POST api/<controller>
         [HttpPost]
+        [Authorize]
         public ActionResult<ShopListRecipeModel> AddShopListRecipe(ShopListRecipeModel model)
         {
 
@@ -103,6 +105,7 @@ namespace RecipeAPI.Controllers
 
         // PUT api/<controller>/5
         [HttpPut("{id}")]
+        [Authorize]
         public ActionResult<ShopListRecipeModel> UpdateShopListRecipe(int id, ShopListRecipeModel model)
         {
 
@@ -138,6 +141,7 @@ namespace RecipeAPI.Controllers
 
         // DELETE api/<controller>/5
         [HttpDelete("{id}")]
+        [Authorize]
         public IActionResult DeletShopListRecipee(int id)
         {
 
