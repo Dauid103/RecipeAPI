@@ -19,7 +19,14 @@ namespace RecipeAPI.Extensions
 {
     public static class ServiceExtensions
     {
-
+        //Changed order
+        public static void ConfigureIdentity(this IServiceCollection services, IConfiguration config)
+        {
+            services.AddIdentity<ApplicationUser, IdentityRole>()
+             .AddEntityFrameworkStores<RecipeIdentityContext>();
+            
+        }
+        
         public static void ConfigureDbContext(this IServiceCollection services, IConfiguration config)
         {
             services.AddDbContext<RecipeContext>(options =>
@@ -27,13 +34,6 @@ namespace RecipeAPI.Extensions
 
             services.AddDbContext<RecipeIdentityContext>(options =>
                 options.UseSqlServer(config.GetConnectionString("IdentityConnection")));
-        }
-
-        public static void ConfigureIdentity(this IServiceCollection services, IConfiguration config)
-        {
-            services.AddIdentity<ApplicationUser, IdentityRole>()
-             .AddEntityFrameworkStores<RecipeIdentityContext>();
-            
         }
 
         public static void ConfigureCustomServices(this IServiceCollection services)
