@@ -24,16 +24,16 @@ namespace RecipeAPI.Extensions
         {
             services.AddDbContext<RecipeContext>(options =>
                 options.UseSqlServer(config.GetConnectionString("RecipeConnection")));
-
-            services.AddDbContext<RecipeIdentityContext>(options =>
-                options.UseSqlServer(config.GetConnectionString("IdentityConnection")));
+            
         }
 
         public static void ConfigureIdentity(this IServiceCollection services, IConfiguration config)
         {
             services.AddIdentity<ApplicationUser, IdentityRole>()
              .AddEntityFrameworkStores<RecipeIdentityContext>();
-            
+
+            services.AddDbContext<RecipeIdentityContext>(options =>
+                options.UseSqlServer(config.GetConnectionString("IdentityConnection")));
         }
 
         public static void ConfigureCustomServices(this IServiceCollection services)
