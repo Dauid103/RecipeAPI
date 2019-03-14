@@ -19,18 +19,18 @@ namespace RecipeAPI.Extensions
 {
     public static class ServiceExtensions
     {
-        //Changed order
-        public static void ConfigureIdentity(this IServiceCollection services, IConfiguration config)
-        {
-            services.AddIdentity<ApplicationUser, IdentityRole>()
-             .AddEntityFrameworkStores<RecipeIdentityContext>();
-            
-        }
-        
+
         public static void ConfigureDbContext(this IServiceCollection services, IConfiguration config)
         {
             services.AddDbContext<RecipeContext>(options =>
                 options.UseSqlServer(config.GetConnectionString("RecipeConnection")));
+            
+        }
+
+        public static void ConfigureIdentity(this IServiceCollection services, IConfiguration config)
+        {
+            services.AddIdentity<ApplicationUser, IdentityRole>()
+             .AddEntityFrameworkStores<RecipeIdentityContext>();
 
             services.AddDbContext<RecipeIdentityContext>(options =>
                 options.UseSqlServer(config.GetConnectionString("IdentityConnection")));
