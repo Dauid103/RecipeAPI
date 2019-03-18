@@ -117,7 +117,7 @@ namespace RecipeAPI.Controllers
 
                 if (result == null) return NotFound($"Unable to find ShopListRecipe with id: {id}");
 
-                if (!_shopListRecipeService.ValidateUpdateShopListRecipe(id, model.ShopListId, model.RecipeId, out errorMessage))
+                if (!_shopListRecipeService.ValidateUpdateShopListRecipe(model.ShopListId, model.RecipeId, out errorMessage))
                 {
                     return BadRequest(errorMessage);
                 }

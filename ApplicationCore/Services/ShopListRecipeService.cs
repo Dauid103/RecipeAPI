@@ -33,7 +33,7 @@ namespace ApplicationCore.Services
             return true;
         }
 
-        public bool ValidateUpdateShopListRecipe(int id, int shopListId, int recipeId, out string errorMessage)
+        public bool ValidateUpdateShopListRecipe(int shopListId, int recipeId, out string errorMessage)
         {
             var shopList = _repository.GetShopListById(shopListId);
             if (shopList == null)

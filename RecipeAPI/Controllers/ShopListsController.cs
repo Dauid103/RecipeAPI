@@ -21,10 +21,10 @@ namespace RecipeAPI.Controllers
     public class ShopListsController : ControllerBase
     {
         private readonly IRepository _repository;
-        private readonly ILogger<ShopList> _logger;
+        private readonly ILogger<ShopListsController> _logger;
         private readonly IMapper _mapper;
 
-        public ShopListsController(IRepository repository, ILogger<ShopList> logger, IMapper mapper)
+        public ShopListsController(IRepository repository, ILogger<ShopListsController> logger, IMapper mapper)
         {
             _repository = repository;
             _logger = logger;
