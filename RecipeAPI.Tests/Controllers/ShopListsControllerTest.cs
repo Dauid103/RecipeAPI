@@ -6,8 +6,10 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using RecipeAPI.Controllers;
 using RecipeAPI.Models;
+using RecipeAPI.Models.Profiles;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Xunit;
 
@@ -18,32 +20,57 @@ namespace RecipeAPI.Tests.Controllers
 
         private readonly Mock<IRepository> _mockRepository;
         private readonly Mock<ILogger<ShopListsController>> _mockLogger;
-        private readonly Mock<IMapper> _mockMapper;
+        private readonly IMapper _mapper;
         private readonly ShopListsController _shopListsController;
 
         public ShopListsControllerTest()
         {
             _mockRepository = new Mock<IRepository>();
             _mockLogger = new Mock<ILogger<ShopListsController>>();
-            _mockMapper = new Mock<IMapper>();
-            _shopListsController = new ShopListsController(_mockRepository.Object, _mockLogger.Object, _mockMapper.Object);
+            _mapper = InitMapper();
+            _shopListsController = new ShopListsController(_mockRepository.Object, _mockLogger.Object, _mapper);
         }
 
+        public IMapper InitMapper()
+        {
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.AddProfile(new MappingProfile());
+            });
+            var mapper = config.CreateMapper();
+
+            return mapper;
+        }
 
         [Fact]
         public void GetAllShopLists_WhenCalled_ReturnsListWithShopListModels()
         {
 
-            var shopListModels = new List<ShopListModel> { new ShopListModel { ShopListId = 1, Name = "ShopList1", CreatedDate = DateTime.Now } };
-            
-            _mockMapper.Setup(m => m.Map<List<ShopListModel>>(It.IsAny<List<ShopList>>())).Returns(shopListModels);
+            _mockRepository.Setup(x => x.GetAllShopLists()).Returns(new List<ShopList> { new ShopList { ShopListId = 1, Name = "ShopList1", CreatedDate = DateTime.Now } });
 
-            var okResult = _shopListsController.GetShopLists();
+            var result = _shopListsController.GetShopLists();
 
-            var items = Assert.IsType<List<ShopListModel>>(okResult.Value);
-            Assert.NotEmpty(items);
-
+            var actionResult = Assert.IsType<ActionResult<List<ShopListModel>>>(result);
+            var returnValue = Assert.IsType<List<ShopListModel>>(actionResult.Value);
+            var shopList = returnValue.FirstOrDefault();
+            Assert.Equal("ShopList1", shopList.Name);
         }
+
+
+        [Fact]
+        public void GetShopListById_WhenCalled_ReturnsNotFoundObjectForNonExistingShopList()
+        {
+            int shopListId = 999;
+
+            _mockRepository.Setup(x => x.GetShopListById(shopListId)).Returns((ShopList)null);
+
+            var result = _shopListsController.GetShopList(shopListId);
+
+            var actionResult = Assert.IsType<ActionResult<ShopListModel>>(result);
+            Assert.IsType<NotFoundResult>(actionResult.Result);
+        }
+
+
 
     }
 }
